@@ -9,7 +9,7 @@ class ImgPipeline(ImagesPipeline):
     #通过抓取的图片url获取一个Request用于下载
     def get_media_requests(self, item, info):
         #返回Request根据图片图片url下载
-        yield scrapy.Request(item['img'])
+        yield scrapy.Request(item['imgUrl'])
     #当下载请求完成后执行该方法
     def item_completed(self, results, item, info):
         #获取下载地址
@@ -18,5 +18,5 @@ class ImgPipeline(ImagesPipeline):
         if not image_path:
             raise DropItem("Item contains no images")
         #将地址存入item
-        item['img'] = image_path[0]
+        item['imgUrl'] = image_path[0]
         return item

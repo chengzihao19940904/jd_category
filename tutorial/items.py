@@ -26,3 +26,18 @@ class CateItem(scrapy.Item):
     name = scrapy.Field()
     child = scrapy.Field()
     pass
+
+class GoodsListItem(scrapy.Item):
+    main_cate = scrapy.Field()
+    thirdCateName = scrapy.Field()
+    thirdUrl = scrapy.Field()
+    secondName = scrapy.Field()
+    secondUrl = scrapy.Field()
+    imgUrl = scrapy.Field() #图片地址
+    title = scrapy.Field()  #标题
+    price = scrapy.Field()  #价格
+    words = scrapy.Field()  #关键词
+    shop_name = scrapy.Field()  #店铺名称
+    tips = scrapy.Field()   
+    detail_url = scrapy.Field() #详情url
+    pass

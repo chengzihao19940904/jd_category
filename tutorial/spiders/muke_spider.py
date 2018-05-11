@@ -4,15 +4,18 @@
 import scrapy
 from tutorial.items import TutorialItem
 from tutorial.items import CateItem
+from tutorial.items import GoodsListItem
 from scrapy_splash import SplashRequest
 import re
 import json
 class muke_spider(scrapy.Spider):
-    name = 'muke'
-    allowed_domains = ['www.jd.com']
+    name = 'jd'
+    allowed_domains = ['www.jd.com',"search.jd.com","item.jd.com","club.jd.com",""]
     # start_urls = [
     #     'https://www.jd.com/'
     # ]
+
+    base_url = "https://list.jd.com/"
     start_urls = [
     'https://dc.3.cn/category/get'
     ]
@@ -40,43 +43,45 @@ class muke_spider(scrapy.Spider):
             #主类标签
             cate_c = item['id'] 
             for second_item in item['s']:
-                item = CateItem()
-                item['main_cate'] = cate_c
+                # item = CateItem()
+                # item['main_cate'] = cate_c
                 second = second_item['n'].split('|')
-                item['url'] = second[0]
-                item['name'] = second[1]
-                item['child'] = []
+                # item['url'] = second[0]
+                # item['name'] = second[1]
+                # item['child'] = []
                 for third_item in second_item['s']:
                     third = third_item['n'].split('|')
                     if not re.search('list.html',third[0]):
                         third[0] = "http://list.jd.com/list.html?cat="+third[0].replace('-',',')
-                    tir = {'url':third[0],'name':third[1]}
-                    item['child'].append(tir)
-                yield item
+                    
+                    if not re.search('http://',third[0]):
+                        third[0] = "http://"+third[0]
+                    # tir = {'url':third[0],'name':third[1]}
+                    # item['child'].append(tir)
+                    yield SplashRequest(third[0].strip(),meta={'thirdCateName':third[1],'thirdUrl':third[0],'secondName':second[1],'secondUrl':second[0],'main_cate':cate_c},callback=self.parse_item,dont_filter=True)
+                
+    def parse_item(self,response):
+        for ret in response.xpath('//ul[contains(@class,"gl-warp")]/li[contains(@class,"gl-item")]'):
+            item = GoodsListItem()
+            item['main_cate'] = response.meta['main_cate']
+            item['thirdCateName'] = response.meta['thirdCateName']
+            item['thirdUrl'] = response.meta['thirdUrl']
+            item['secondName'] = response.meta['secondName']
+            item['secondUrl'] = response.meta['secondUrl']
+            item['imgUrl'] = "".join(ret.xpath('div/div[contains(@class,"p-img")]/a/img/@src').extract())
+            item['price'] ="".join(ret.xpath('div/div[@class="p-price"]/strong[@class="J_price"]/i/text()').extract())
+            item['title'] ="".join(ret.xpath('div/div[@class="p-name"]/a/em/text()').extract()).strip()
+            item['words'] = "".join(ret.xpath('div/div[@class="p-name"]/a/@title').extract())
+            item['shop_name'] = "".join(ret.xpath('div/div[@class="p-shop"]/span/a/@title').extract())
+            # tipsRet = ret.xpath('div/div[contains(@class,"p-icons")]')
+            tips = ret.xpath('div/div[contains(@class,"p-icons")]/i/@data-tips').extract()
+            item['tips'] =  "|".join(tips)
+            item['detail_url'] = "".join(ret.xpath('div/div[contains(@class,"p-img")]/a/@href').extract())
+            yield item
 
-
-
-
-        
-        # print(response.xpath('//div[@id="J_popCtn"]/div[contains(@class,"cate_part")]').extract())
-        # for res in response.xpath('//div[@class="cate_detail"]'):
-        #     print(res.extract())
-        #     item = TutorialItem()
-        #     item['title'] = res.xpath('a/div/h3/text()').extract()[0]
-        #     item['content'] = res.xpath('a/div//p/text()').extract()[0]
-        #     item['img'] = 'http:'+res.xpath('a/div/img/@src').extract()[0]
-        #     item['label'] = ','.join(res.xpath('a//div[@class="course-label"]/label/text()').extract())
-        #     user = res.xpath('a//div[@class="course-card-info"]/span/text()').extract()
-        #     item['student'] = user[-1]
-        #     item['level'] = user[0]
-        #     yield item
-
-        # next_url = response.xpath('//a[contains(text(),"下一页")]/@href').extract()
-        # if next_url:
-        #     page = self.root_domains+next_url[0]
-        #     yield scrapy.Request(page,callback=self.parse)
-
-
-
+        next_url = response.xpath('//a[@class="pn-next"]/@href').extract()
+        if next_url:
+            page = self.root_domains+next_url[0]
+            yield SplashRequest(page,meta={'thirdCateName':response.meta['thirdCateName'],'thirdUrl':response.meta['thirdUrl'],'secondName':response.meta['secondName'],'secondUrl':response.meta['secondUrl'],'main_cate':response.meta['main_cate']},callback=self.parse_item,dont_filter=True)
 
 
