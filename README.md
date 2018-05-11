@@ -18,4 +18,18 @@ CREATE TABLE `jd_third_cate` (
   `url` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=160 DEFAULT CHARSET=utf8;
+
+商品信息表
+CREATE TABLE `goods_detail` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `cate_id` int(10) NOT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `price` decimal(10,4) DEFAULT NULL,
+  `imgUrl` varchar(255) DEFAULT NULL,
+  `words` varchar(255) DEFAULT NULL,
+  `shop_name` varchar(255) DEFAULT NULL,
+  `detail_url` varchar(255) DEFAULT NULL,
+  `tips` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5387 DEFAULT CHARSET=utf8;
 ```
