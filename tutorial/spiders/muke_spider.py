@@ -14,7 +14,8 @@ class muke_spider(scrapy.Spider):
     #     'https://www.jd.com/'
     # ]
     start_urls = [
-    'https://dc.3.cn/category/get']
+    'https://dc.3.cn/category/get'
+    ]
     headers = {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
         "Accept-Language": "zh-CN,zh;q=0.8",

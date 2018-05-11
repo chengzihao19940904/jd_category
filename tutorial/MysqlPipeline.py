@@ -25,7 +25,7 @@ class MysqlPipeline(object):
                 cursor.execute(sql2,(self.conn.insert_id(),value['name'],value['url']))
         
         self.conn.commit()
-        cursor.close()
+        # cursor.close()
         # try:
         #     print(cursor.execute(sql,(item['title'],item['content'],item['label'],item['img'][0],item['student'],item['level'])))
         #     db.commit()
@@ -35,3 +35,6 @@ class MysqlPipeline(object):
         #     db.rollback()
         # db.close()
         return item
+
+    def close_item(self,spider):
+        self.conn.close()
